@@ -1,0 +1,207 @@
+{
+  "name": "workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "dd73b4a6-8f03-4244-bdb2-8a9afaa1b96b",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://xmlcalendar.ru/data/ru/2022/calendar.csv",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "519eb607-7f1c-44d2-82f5-7244b48841ca",
+      "name": "GET CSV",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1440,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://xmlcalendar.ru/data/ru/2022/calendar.json",
+        "options": {
+          "allowUnauthorizedCerts": false
+        }
+      },
+      "id": "2ea743d0-b2e1-4290-8518-40ac16cd72c7",
+      "name": "GET Json",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1660,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "da8d1907-09c7-4a9c-ac23-0a404c3ad6bf",
+      "name": "Parse CSV",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "match",
+              "stringValue": "={{JSON.stringify($json[\"Parse CSV\"][0]) === JSON.stringify($json[\"GET json\"][0]) ? \"true\" : \"false\"}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a5758203-b968-46bc-9ebb-6c36e76fe3e3",
+      "name": "Compare data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        1940,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "{{$json[\"Equal\"]}}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "id": "68dd9402-4f15-47a9-97cf-c1078b08411d",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        540
+      ]
+    }
+  ],
+  "pinData": {
+    "Parse CSV": [
+      {
+        "json": {
+          "Год/Месяц": "2022",
+          "Январь": "1,2,3,4,5,6,7,8,9,15,16,22,23,29,30",
+          "Февраль": "5,6,12,13,19,20,22*,23,26,27",
+          "Март": "5*,6,7+,8,12,13,19,20,26,27",
+          "Апрель": "2,3,9,10,16,17,23,24,30",
+          "Май": "1,2+,3+,7,8,9,10+,14,15,21,22,28,29",
+          "Июнь": "4,5,11,12,13+,18,19,25,26",
+          "Июль": "2,3,9,10,16,17,23,24,30,31",
+          "Август": "6,7,13,14,20,21,27,28",
+          "Сентябрь": "3,4,10,11,17,18,24,25",
+          "Октябрь": "1,2,8,9,15,16,22,23,29,30",
+          "Ноябрь": "3*,4,5,6,12,13,19,20,26,27",
+          "Декабрь": "3,4,10,11,17,18,24,25,31",
+          "Всего рабочих дней": "247",
+          "Всего праздничных и выходных дней": "118",
+          "Количество рабочих часов при 40-часовой рабочей неделе": "1973",
+          "Количество рабочих часов при 36-часовой рабочей неделе": "1775.4",
+          "Количество рабочих часов при 24-часовой рабочей неделе": "1182.6"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "GET CSV",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET Json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET CSV": {
+      "main": [
+        [
+          {
+            "node": "Parse CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Json": {
+      "main": [
+        [
+          {
+            "node": "Compare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse CSV": {
+      "main": [
+        [
+          {
+            "node": "Compare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare data": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e8d51b23-c3b5-4169-9a23-7c1926a10e28",
+  "id": "jA5LCJf1c0IJRHxV",
+  "meta": {
+    "instanceId": "db60b705cced1acf990ba9784d030402d98f94029d333172049bb3e972e11b32"
+  },
+  "tags": []
+}
